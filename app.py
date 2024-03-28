@@ -4,13 +4,13 @@ import plotly.express as px
 import plotly.graph_objects as go
 import dash
 from dash import Dash, dcc, html, Input, Output, callback
-
+import flask
 
 #---------------------------------------------------
-WHO = pd.read_csv('assets/Child_BMI_references_clean/WHO_2024_03_25.csv')
-IOTF = pd.read_csv('assets/Child_BMI_references_clean/IOTF_2024_03_25.csv')
-CDC_pct = pd.read_csv('assetsChild_BMI_references_clean/CDC_2023_pct_P95_2024_03_25.csv')
-CDC = pd.read_csv('assets/Child_BMI_references_clean/CDC_2023_zscore_2024_03_25.csv')
+WHO = pd.read_csv('assets/WHO_2024_03_25.csv')
+IOTF = pd.read_csv('assets/IOTF_2024_03_25.csv')
+CDC_pct = pd.read_csv('assets/CDC_2023_pct_P95_2024_03_25.csv')
+CDC = pd.read_csv('assets/CDC_2023_zscore_2024_03_25.csv')
 
 IOTF.name = 'IOTF'
 WHO.name = 'WHO'
@@ -28,8 +28,14 @@ for reference in ALL_references:
     girls[f'{reference.name}'] = reference[reference['sex'] == 2]
 
 #-----------------------------------------
+server = flask.Flask(__name__)
 
-app = dash.Dash(__name__)
+app = dash.Dash(
+    __name__,
+    server=server,
+    title="Child BMI references for children with overweight and obesity",
+    suppress_callback_exceptions=True,
+)
 
 app.layout = html.Div([
             html.H1("Child BMI references for children with overweight and obesity"),
@@ -236,4 +242,4 @@ def update_graph(sex, age, bmi, WHO, IOTF, CDC, CDC95P):
     return fig
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=False)
