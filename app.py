@@ -2,8 +2,7 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
-import dash
-from dash import dcc, html
+from dash import Dash, dcc, html, Input, Output, callback
 
 
 #---------------------------------------------------
