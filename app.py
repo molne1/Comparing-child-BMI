@@ -216,15 +216,14 @@ def update_graph(sex, age, bmi, WHO, IOTF, CDC, CDC95P):
     x_ticks = [month for i, month in enumerate(x) if month % 12 == 0 and i % 2 == 0]  
     x_labels = [str(i) for i in range(len(x_ticks))]
 
-    fig.update_layout(legend=dict(x=0),
+    fig.update_layout(
+        legend=dict(x=0),
         plot_bgcolor='white',
-        
         xaxis=dict(
             tickmode='array',
             tickvals=x_ticks[::2],
-            ticktext=x_labels[::2],gridcolor='lightgrey'
-        ),
-        yaxis=dict(title="Age in Years"), titlefont=dict(size=10),gridcolor='lightgrey'),
+            ticktext=x_labels[::2],gridcolor='lightgrey'),
+        yaxis=dict(title="Age in Years", titlefont=dict(size=10),gridcolor='lightgrey'),
         xaxis_title= "Age in Years" ,
         yaxis_title="Body Mass Index (kg/m^2)")
     
