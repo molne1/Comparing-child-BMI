@@ -33,7 +33,7 @@ server = flask.Flask(__name__)
 app = dash.Dash(
     __name__,
     server=server,
-    title="Child BMI references for children with overweight and obesity",
+    title="Child BMI references for children with overweight and obesity.",
     suppress_callback_exceptions=True,
 )
 
