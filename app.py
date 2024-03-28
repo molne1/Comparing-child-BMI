@@ -218,9 +218,9 @@ def update_graph(sex, age, bmi, WHO, IOTF, CDC, CDC95P):
             tickvals=x_ticks[::2],
             ticktext=x_labels[::2],gridcolor='lightgrey'
         ),
-        yaxis=dict(title=ylabel, titlefont=dict(size=fs_label),gridcolor='lightgrey'),
-        xaxis_title=xlabel,
-        yaxis_title=ylabel)
+        yaxis=dict(title="Age in Years"), titlefont=dict(size=10),gridcolor='lightgrey'),
+        xaxis_title= "Age in Years" ,
+        yaxis_title="Body Mass Index (kg/m^2)")
     
 # plot child
     if age is not None and bmi is not None:
