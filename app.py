@@ -149,13 +149,13 @@ def update_graph(sex, age, bmi, WHO, IOTF, CDC, CDC95P):
 
     if sex  == 'girl':
         WHO_axes = girls['WHO']
-        IOTF = girls['IOTF']
+        IOTF_axes = girls['IOTF']
         CDC_axes = girls['CDC']
         CDC95P_axes = girls['CDC_pct']  
 
     else:
         WHO_axes = boys['WHO']
-        IOTF = boys['IOTF']
+        IOTF_axes = boys['IOTF']
         CDC_axes = boys['CDC']
         CDC_95P = boys['CDC_pct']
 
