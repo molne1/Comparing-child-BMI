@@ -8,22 +8,23 @@ import flask
 import dash_bootstrap_components as dbc
 
 #---------------------------------------------------
+SBMI = pd.read_csv('assets/2024-04-09_SBMI_SD1-SD2.csv')
 WHO = pd.read_csv('assets/WHO_2024_03_25.csv')
 IOTF = pd.read_csv('assets/IOTF_2024_03_25.csv')
 CDC_pct = pd.read_csv('assets/CDC_2023_pct_P95_2024_03_25.csv')
 CDC = pd.read_csv('assets/CDC_2023_zscore_2024_03_25.csv')
 
-IOTF.name = 'IOTF'
+
+SBMI.name = 'SBMI'
 WHO.name = 'WHO'
+IOTF.name = 'IOTF'
 CDC_pct.name = 'CDC_pct'
 CDC.name = 'CDC'
 
 
-ALL_references = [IOTF, WHO, CDC_pct, CDC]
-
 boys = {}
 girls = {}
-ALL_references = [IOTF, WHO, CDC_pct, CDC]
+ALL_references = [SBMI, WHO,IOTF, CDC_pct, CDC]
 for reference in ALL_references:
     boys[f'{reference.name}'] = reference[reference['sex'] == 1]
     girls[f'{reference.name}'] = reference[reference['sex'] == 2]
@@ -32,6 +33,7 @@ for reference in ALL_references:
 server = flask.Flask(__name__)
 #-----------------------------------------
 
+SBMI_color = 'goldenrod'
 WHO_color = '#009CDE'
 IOTF_color = 'green'
 CDC_color = 'red'
@@ -41,7 +43,6 @@ CDCpct_color = 'maroon'
 ylabel = 'Body Mass Index (kg/m^2)'
 xlabel = 'Age (Years)'
 fs_label = 18
-
 
 #-----------------------------------
 
@@ -96,6 +97,25 @@ app.layout = dbc.Container([
     ),
 
 dbc.Row([
+        dbc.Col([ html.H6("s-BMI", style={"color": SBMI_color}),
+                dbc.Checklist(
+
+                    id='checkbox-container_SBMI',
+                    options=[
+                        {'label': 'BMI25 - overweight', 'value': '25'},
+                        {'label': 'BMI30 - obesity', 'value': '30'},
+                        {'label': 'BMI35 - severe obesity', 'value': '35'},
+                        {'label': 'BMI40', 'value': '40'},
+                        {'label': 'BMI45', 'value': '45'},
+                        {'label': 'BMI50', 'value': '50'},
+                        {'label': 'BMI55', 'value': '55'},
+                        {'label': 'BMI60', 'value': '60'}
+                    ],
+                    value = ["25"],
+                    switch=True
+                  
+                )]), 
+    
         dbc.Col([
                 html.H6("World Health Organisation", style={"color": WHO_color}),
                 dbc.Checklist(
@@ -215,20 +235,24 @@ dbc.Row(html.P("This app was created by Maja Engsner, the code is openly availab
     [Input(component_id = 'sex', component_property = 'value'),
      Input(component_id = 'age', component_property = 'value'),
     Input(component_id = 'BMI', component_property = 'value'),
+    
+     Input(component_id =  'checkbox-container_SBMI', component_property='value'), 
     Input(component_id = 'checkbox-container_WHO', component_property='value'), 
     Input(component_id = 'checkbox-container_IOTF', component_property = 'value'),
     Input(component_id = 'checkbox-container_CDC', component_property='value'), 
     Input(component_id = 'checkbox-container_CDC95P', component_property = 'value'),
     ]
 )
-def update_graph(sex, age, bmi, WHO, IOTF, CDC, CDC95P):
+def update_graph(sex, age, bmi, SBMI, WHO, IOTF, CDC, CDC95P):
     if sex == 1:
+        SBMI_axes = girls['SBMI']  
         WHO_axes = girls['WHO']
         IOTF_axes = girls['IOTF']
         CDC_axes = girls['CDC']
         CDC95P_axes = girls['CDC_pct']  
 
     if sex == 2:
+        SBMI_axes = boys['SBMI']  
         WHO_axes = boys['WHO']
         IOTF_axes = boys['IOTF']
         CDC_axes = boys['CDC']
@@ -236,6 +260,16 @@ def update_graph(sex, age, bmi, WHO, IOTF, CDC, CDC95P):
     colors = ['blue', 'red']
 
     fig = go.Figure()
+#SBMI
+    for level in reversed(SBMI):
+        fig.add_trace(go.Scatter(x=SBMI_axes['age_months'], y=SBMI_axes[level], mode='lines', name=level,
+                                 line=dict(color=SBMI_color), showlegend=False))
+        
+        label = f'SBMI-{level}'
+        placement_y = 98
+        max_value_x = SBMI_axes[(SBMI_axes['age_months'] == placement_y)][level].iloc[0]
+        fig.add_annotation(x=placement_y, y=max_value_x, text=label, showarrow=False, font=dict(size=8), bgcolor="white",
+                           bordercolor = SBMI_color, borderwidth=1)
 
 #WHO
     for level in reversed(WHO):
