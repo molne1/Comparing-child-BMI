@@ -179,14 +179,14 @@ dbc.Row([
             ],  className =""
         ),
         dbc.Col([
-                html.H6("CDC % above 95 percentile",style={"color": CDCpct_color}),
+                html.H6("% above 95 percentile (CDC) ",style={"color": CDCpct_color}),
                 dbc.Checklist(
                     id='checkbox-container_CDC95P',
                     options=[
                         {'label': '85 percentile - overweight', 'value': 'P85'},
-                        {'label': '95 percentile - obesity class I', 'value': 'P95'},
-                        {'label': '120% - obesity class II', 'value': 'pct120ofP95'},
-                        {'label': '140% - obesity class III', 'value': 'pct140ofP95'},
+                        {'label': '95 percentile - obesity ', 'value': 'P95'},
+                        {'label': '120% - severe obesity ', 'value': 'pct120ofP95'},
+                        {'label': '140%', 'value': 'pct140ofP95'},
                         {'label': '150%', 'value': 'pct150ofP95'},
                         {'label': '160%', 'value': 'pct160ofP95'},
                         {'label': '180%', 'value': 'pct180ofP95'},
@@ -202,6 +202,11 @@ dbc.Row([
 dbc.Row([
     dbc.Accordion(
             [
+                dbc.AccordionItem(
+                    [ html.P("References:"),
+                     ],
+                    title="Standardized BMI (s-BMI)",
+                ),
                 dbc.AccordionItem(
                     [ html.P("References:"),
                      html.P("https://www.who.int/toolkits/child-growth-standards/standards/body-mass-index-for-age-bmi-for-age "),
@@ -257,7 +262,6 @@ def update_graph(sex, age, bmi, SBMI, WHO, IOTF, CDC, CDC95P):
         IOTF_axes = boys['IOTF']
         CDC_axes = boys['CDC']
         CDC95P_axes = boys['CDC_pct']
-    colors = ['blue', 'red']
 
     fig = go.Figure()
 #SBMI
