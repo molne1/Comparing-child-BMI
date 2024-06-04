@@ -36,7 +36,7 @@ for reference in ALL_references:
     
 #-----------------------------------------
 # SBMI functions 
-SBMI_ref = pd.read_csv ('assets/2024-06-04_sbmi_expanded_SD_SD1-SD2.csv')
+SBMI_ref = pd.read_csv('assets/2024-06-04_sbmi_expanded_SD_SD1-SD2.csv')
 
 def LMS(bmi, list_with_LMS):
     L = list_with_LMS["L"]         
@@ -95,7 +95,6 @@ def sbmi_zscore(age, sex, bmi):
             # find zscore for bmi
             reference_row = reference[reference['age_months']== age]
             zscore = LMS(bmi, reference_row)
-            print(zscore)
                 
             if zscore <=3:
                 sbmi_return = sbmi_cutoff_below_3SD(zscore, sex)
@@ -320,7 +319,7 @@ dbc.Row([
                  html.P("Severe Obesity: s-BMI >35 "),
                  html.P(""),
                  html.B("Estimate child's BMI"),
-                 html.P("To estimate an individual child's BMI, age is first determined as months. For each child their BMI is compared to SD levels at the corresponding age, by linear interpolation. This results in a child’s z-score, which is then compared to an18 years old and by linear interpolation the corresponding BMI is estimated. This is similar to the method IOTF uses with the exception that s-BMI uses linear interpolation."),
+                 html.P("To estimate an individual child's BMI, age is first determined as months. LMS zscore is estimated.  For each child their BMI is compared to SD levels at the corresponding age, by linear interpolation. This results in a child’s z-score, which is then compared to an18 years old and by linear interpolation the corresponding BMI is estimated. This is similar to the method IOTF uses with the exception that s-BMI uses linear interpolation."),
                  html.P(""),
                  html.B("Links"),
                  html.P(""),
