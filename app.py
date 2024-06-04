@@ -36,7 +36,16 @@ for reference in ALL_references:
     
 #-----------------------------------------
 # SBMI functions 
-SBMI_ref = pd.read_csv ('assets/2024-05-14_SBMI_SD1SD2.csv')
+SBMI_ref = pd.read_csv ('assets/2024-06-04_sbmi_expanded_SD_SD1-SD2.csv')
+
+def LMS(bmi, list_with_LMS):
+    L = list_with_LMS["L"]         
+    M = list_with_LMS["M"]
+    S = list_with_LMS["S"]
+    
+    z_score = (((bmi/ M) ** L )- 1) / (L * S)
+    return z_score
+
 def numeric_values_from_sd_columns(list_columns):
     list_sd = []
     for name in list_columns:
@@ -45,6 +54,7 @@ def numeric_values_from_sd_columns(list_columns):
             cleaned_name = "-" + cleaned_name
         list_sd.append(float(cleaned_name))
     return list_sd
+
 def sbmi_cutoff_18(sd_columns, zscore, sex):
     reference_18 = SBMI_ref[SBMI_ref['age_months']== 216]
     if sex == 1:
@@ -56,7 +66,23 @@ def sbmi_cutoff_18(sd_columns, zscore, sex):
     y_data = reference_row[sd_columns].values[0]
     y_f = interp1d(x_data, y_data, 'linear')
     sbmi = y_f(zscore)
-    return sbmi    
+    return sbmi   
+
+def sbmi_cutoff_below_3SD(zscore, sex):
+    reference_18 = SBMI_ref[SBMI_ref['age_months']== 216]
+
+    if sex == 1:
+        reference_row = reference_18[reference_18['sex']==1]
+    else:
+        reference_row =  reference_18[reference_18['sex']==2]
+
+    L= reference_row['L']
+    M = reference_row['M']
+    S = reference_row['S']
+    
+    BMI = M*(1+L*S*zscore)**(1/L)
+    return BMI     
+     
 def sbmi_zscore(age, sex, bmi):
     sd_columns =  [col for col in SBMI_ref if col.startswith('SD')]
 
@@ -68,14 +94,22 @@ def sbmi_zscore(age, sex, bmi):
             
             # find zscore for bmi
             reference_row = reference[reference['age_months']== age]
-            y_data  = numeric_values_from_sd_columns(sd_columns)
-            x_data = reference_row[sd_columns].values[0]
-            y_f = interp1d(x_data, y_data, 'linear')
-            sbmi_zscore = y_f(bmi)
-            # take zscore and give it the BMI value at 18 years old. 
-            sbmi_return = sbmi_cutoff_18(sd_columns, sbmi_zscore, sex)
-            sbmi_string = "s-BMI: " +str(np.round(sbmi_return, 1))
-            
+            zscore = LMS(bmi, reference_row)
+            print(zscore)
+                
+            if zscore <=3:
+                sbmi_return = sbmi_cutoff_below_3SD(zscore, sex)
+                sbmi_string = "s-BMI: " +str(np.round(sbmi_return, 1))
+
+            else:
+                y_data  = numeric_values_from_sd_columns(sd_columns)
+                x_data = reference_row[sd_columns].values[0]
+                y_f = interp1d(x_data, y_data, 'linear')
+                sbmi_zscore = y_f(bmi)
+                # take zscore and give it the BMI value at 18 years old. 
+                sbmi_return = sbmi_cutoff_18(sd_columns, sbmi_zscore, sex)
+                sbmi_string = "s-BMI: " +str(np.round(sbmi_return, 1))
+                
     return (sbmi_return,sbmi_string)
 #-----------------------------------------
 server = flask.Flask(__name__) 
