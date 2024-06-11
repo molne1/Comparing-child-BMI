@@ -130,7 +130,7 @@ fs_label = 18
 app = dash.Dash(__name__,
                 title="Child BMI references for children with overweight or obesity.",
                 suppress_callback_exceptions=True, server=server, 
-                external_stylesheets=[dbc.themes.SANDSTONE])
+                external_stylesheets=[dbc.themes.SANDSTONE,  dbc.icons.BOOTSTRAP])
 
 app.layout = dbc.Container([
     dbc.Row([html.H1("   ")],className=" mb-5"),
@@ -319,7 +319,9 @@ dbc.Row([
                  html.P("Severe Obesity: s-BMI >35 "),
                  html.P(""),
                  html.B("Estimate child's BMI"),
-                 html.P("To estimate an individual child's BMI, age is first determined as months. LMS zscore is estimated.  For each child their BMI is compared to SD levels at the corresponding age, by linear interpolation. This results in a child’s z-score, which is then compared to an18 years old and by linear interpolation the corresponding BMI is estimated. This is similar to the method IOTF uses with the exception that s-BMI uses linear interpolation."),
+                 html.P("""To estimate an individual child's BMI, age is first determined as months. For each child their BMI is converted to a standard deviation score (SD) using the LMS formula. 
+                        If their SD score is equal or less than 3 compared to SD levels at the corresponding age, the LMS formula is solved for said SD score at 18 years of age.
+                        This gives the estimate of a s-BMI score at 18 years of age. If SD is above 3, linear interpolation is used to find the corresponding s-BMI. """),
                  html.P(""),
                  html.B("Links"),
                  html.P(""),
@@ -349,7 +351,7 @@ dbc.Row([
                 
                 ],
 
-                title="World Health Organisation(WHO)",),
+                title="World Health Organisation (WHO)",),
             dbc.AccordionItem(
                 [html.B("Reference"), 
                  html.P("Reference tables were retrieved from the article Extended international (IOTF) body mass index cut-offs for thinness, overweight and obesity (Cole & Lobstein, 2012, doi:10.1111/j.2047-6310.2012.00064.x) in Supplement Table S1 & S2."),
@@ -393,31 +395,36 @@ dbc.Row([
     className ="mt-5 "
 ), 
 dbc.Row(
-    [html.P("This app was created by Maja Engsner, the code is openly available at GitHub, and together with the graph is free to use under creative commons licence (CC). No funding was received for creating this app. Find links below to Maja Engsner's profile on Uppsala University and LinkedIn as well as the GitHub repository", className= "mt-4"),
+    [html.P("""This app was created by me, Maja Engsner. The code is openly available at GitHub (see below), and together with the graph is free to use under creative commons licence (CC). 
+            No funding was received for creating this app. You can find links below to my profile pages on Uppsala University and LinkedIn, as well as the GitHub repository."""
+            , className= "mt-4"),
      html.Span
      ([
-        dbc.Badge(
-            "Uppsala University",
+        dbc.Button(
+            [html.I(className="bi bi-easel me-2"), "Uppsala University"],
             href="https://www.uu.se/kontakt-och-organisation/personal?query=N20-1653",
             color="danger",
             className="text-decoration-none p-2 me-2",
+            target='_blank'
         ),
-        dbc.Badge(
-            "LinkedIn",
+        dbc.Button(
+            [html.I(className="bi bi-linkedin me-2"), "LinkedIn"], 
             href="https://www.linkedin.com/in/maja-engsner-b4b194141/",
             color="primary",
             className="text-decoration-none p-2 mx-2",
+            target='_blank'
         ),
-        dbc.Badge(
-            "GitHub repository",
+        dbc.Button(
+            [html.I(className="bi bi-github me-2"), "GitHub repository"],
             href="https://github.com/molne1/Comparing-child-BMI",
             color="secondary",
             className="text-decoration-none p-2 mx-2",
-        )],
+            target='_blank'
+        ), 
+        ],
 
     )])
 ])
-
 @app.callback(
     Output(component_id='graph-container', component_property='figure'),
     Output(component_id='sbmi', component_property='children'),
