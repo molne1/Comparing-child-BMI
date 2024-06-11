@@ -39,9 +39,9 @@ for reference in ALL_references:
 SBMI_ref = pd.read_csv('assets/2024-06-04_sbmi_expanded_SD_SD1-SD2.csv')
 
 def LMS(bmi, list_with_LMS):
-    L = list_with_LMS["L"]         
-    M = list_with_LMS["M"]
-    S = list_with_LMS["S"]
+    L = list_with_LMS["L"].item()         
+    M = list_with_LMS["M"].item()
+    S = list_with_LMS["S"].item()
     
     z_score = (((bmi/ M) ** L )- 1) / (L * S)
     return z_score
