@@ -327,7 +327,7 @@ dbc.Row([
                  html.P(""),
                  html.A("Go to GitHub for processed table", href="https://raw.githubusercontent.com/molne1/Comparing-child-BMI/main/assets/2024-05-14_RBMI_SD1SD2.csv ", target="_blank"),
                 ],
-                title="Standardized BMI to the age of 18 years (R-BMI)",
+                title="Reference-point BMI from Adapted World Health Organisation population (R-BMI)",
             ),
             dbc.AccordionItem(
                 [html.B("Reference"),
@@ -348,10 +348,9 @@ dbc.Row([
                 html.A("Go to reference WHO 5-19 years ", href="https://www.who.int/tools/growth-reference-data-for-5to19-years/indicators/bmi-for-age", target="_blank"),
                 html.P(""),
                 html.A("Go to GitHub for processed table", href="https://raw.githubusercontent.com/molne1/Comparing-child-BMI/main/assets/2024-05-14_WHO_original_clean.csv", target="_blank"),
-                
                 ],
-
                 title="World Health Organisation (WHO)",),
+      
             dbc.AccordionItem(
                 [html.B("Reference"), 
                  html.P("Reference tables were retrieved from the article Extended international (IOTF) body mass index cut-offs for thinness, overweight and obesity (Cole & Lobstein, 2012, doi:10.1111/j.2047-6310.2012.00064.x) in Supplement Table S1 & S2."),
