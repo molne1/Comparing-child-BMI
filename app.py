@@ -11,7 +11,7 @@ from scipy.interpolate import interp1d
 
 
 #---------------------------------------------------
-SBMI = pd.read_csv('assets/2024-05-14_SBMI_SD1SD2.csv', usecols=['sex', 'age_months', '25', '30','35', '40', '45', '50', '55', '60' ] )
+RBMI = pd.read_csv('assets/2024-05-14_RBMI_SD1SD2.csv', usecols=['sex', 'age_months', '25', '30','35', '40', '45', '50', '55', '60' ] )
 WHO = pd.read_csv('assets/2024-05-14_WHO_original_clean.csv', usecols= [ 'sex', 'age_months','SD0','SD1', 'SD2','SD3', 'SD4', 'SD5', 'SD6', 'SD7', 'SD8'])
 IOTF = pd.read_csv('assets/2024_05_14_IOTF.csv', usecols= ['sex', 'age_months', 'BMI_25', 'BMI_30','BMI_35', 'BMI_40', 'BMI_45', 'BMI_50', 'BMI_55', 'BMI_60',])
 CDC_pct = pd.read_csv('assets/2024-05-08_CDC_2022_clean.csv', usecols=['sex', 'age_months', 'P85','P95', 'pct120ofP95','pct140ofP95', 'pct150ofP95','pct160ofP95', 'pct180ofP95', 'pct190ofP95', 'pct200ofP95'])
@@ -20,7 +20,7 @@ CDC = pd.read_csv('assets/2024-05-08_CDC_2022_clean.csv', usecols=['sex', 'age_m
                                                                    'SD4.5', 'SD5'] )
 
 
-SBMI.name = 'SBMI'
+RBMI.name = 'RBMI'
 WHO.name = 'WHO'
 IOTF.name = 'IOTF'
 CDC_pct.name = 'CDC_pct'
@@ -29,14 +29,14 @@ CDC.name = 'CDC'
 
 boys = {}
 girls = {}
-ALL_references = [SBMI, WHO,IOTF, CDC_pct, CDC]
+ALL_references = [RBMI, WHO,IOTF, CDC_pct, CDC]
 for reference in ALL_references:
     boys[f'{reference.name}'] = reference[reference['sex'] == 1]
     girls[f'{reference.name}'] = reference[reference['sex'] == 2]
     
 #-----------------------------------------
-# SBMI functions 
-SBMI_ref = pd.read_csv('assets/2024-06-04_sbmi_expanded_SD_SD1-SD2.csv')
+# RBMI functions 
+RBMI_ref = pd.read_csv('assets/2024-06-04_RBMI_expanded_SD_SD1-SD2.csv')
 
 def LMS(bmi, list_with_LMS):
     L = list_with_LMS["L"].item()         
@@ -55,8 +55,8 @@ def numeric_values_from_sd_columns(list_columns):
         list_sd.append(float(cleaned_name))
     return list_sd
 
-def sbmi_cutoff_18(sd_columns, zscore, sex):
-    reference_18 = SBMI_ref[SBMI_ref['age_months']== 216]
+def RBMI_cutoff_18(sd_columns, zscore, sex):
+    reference_18 = RBMI_ref[RBMI_ref['age_months']== 216]
     if sex == 1:
         reference_row = reference_18[reference_18['sex']==1]
     else:
@@ -65,11 +65,11 @@ def sbmi_cutoff_18(sd_columns, zscore, sex):
     x_data  = numeric_values_from_sd_columns(sd_columns)
     y_data = reference_row[sd_columns].values[0]
     y_f = interp1d(x_data, y_data, 'linear')
-    sbmi = y_f(zscore)
-    return sbmi   
+    RBMI = y_f(zscore)
+    return RBMI   
 
-def sbmi_cutoff_below_3SD(zscore, sex):
-    reference_18 = SBMI_ref[SBMI_ref['age_months']== 216]
+def RBMI_cutoff_below_3SD(zscore, sex):
+    reference_18 = RBMI_ref[RBMI_ref['age_months']== 216]
 
     if sex == 1:
         reference_row = reference_18[reference_18['sex']==1]
@@ -83,39 +83,39 @@ def sbmi_cutoff_below_3SD(zscore, sex):
     BMI = M*(1+L*S*zscore)**(1/L)
     return BMI     
      
-def sbmi_zscore(age, sex, bmi):
-    sd_columns =  [col for col in SBMI_ref if col.startswith('SD')]
+def RBMI_zscore(age, sex, bmi):
+    sd_columns =  [col for col in RBMI_ref if col.startswith('SD')]
 
     if int(age) <= int(216):
             if sex == 1:
-                reference = SBMI_ref[SBMI_ref['sex']==1]
+                reference = RBMI_ref[RBMI_ref['sex']==1]
             else:
-                reference =  SBMI_ref[SBMI_ref['sex']==2]
+                reference =  RBMI_ref[RBMI_ref['sex']==2]
             
             # find zscore for bmi
             reference_row = reference[reference['age_months']== age]
             zscore = LMS(bmi, reference_row)
                 
             if zscore <=3:
-                sbmi_return = sbmi_cutoff_below_3SD(zscore, sex)
-                sbmi_string = "s-BMI: " +str(np.round(sbmi_return, 1))
+                RBMI_return = RBMI_cutoff_below_3SD(zscore, sex)
+                RBMI_string = "R-BMI: " +str(np.round(RBMI_return, 1))
 
             else:
                 y_data  = numeric_values_from_sd_columns(sd_columns)
                 x_data = reference_row[sd_columns].values[0]
                 y_f = interp1d(x_data, y_data, 'linear')
-                sbmi_zscore = y_f(bmi)
+                RBMI_zscore = y_f(bmi)
                 # take zscore and give it the BMI value at 18 years old. 
-                sbmi_return = sbmi_cutoff_18(sd_columns, sbmi_zscore, sex)
-                sbmi_string = "s-BMI: " +str(np.round(sbmi_return, 1))
+                RBMI_return = RBMI_cutoff_18(sd_columns, RBMI_zscore, sex)
+                RBMI_string = "R-BMI: " +str(np.round(RBMI_return, 1))
                 
-    return (sbmi_return,sbmi_string)
+    return (RBMI_return,RBMI_string)
 #-----------------------------------------
 server = flask.Flask(__name__) 
 
 #-----------------------------------------
 
-SBMI_color = 'goldenrod'
+RBMI_color = 'goldenrod'
 WHO_color = '#009CDE'
 IOTF_color = 'green'
 CDC_color = 'red'
@@ -195,7 +195,7 @@ app.layout = dbc.Container([
                        
                     ),
                 dbc.Row(
-                    dbc.Card(id = 'sbmi', className="mb-3 mt-4  p-2", color="primary", inverse=True)
+                    dbc.Card(id = 'RBMI', className="mb-3 mt-4  p-2", color="primary", inverse=True)
                         )
                 ],
                     className = "mt-3 ",width = 12,  md = 3, 
@@ -205,10 +205,10 @@ app.layout = dbc.Container([
     ),
 
 dbc.Row([
-        dbc.Col([ html.H6("s-BMI", style={"color": SBMI_color}),
+        dbc.Col([ html.H6("R-BMI", style={"color": RBMI_color}),
                 dbc.Checklist(
 
-                    id='checkbox-container_SBMI',
+                    id='checkbox-container_RBMI',
                     options=[
                         {'label': 'BMI25 - overweight', 'value': '25'},
                         {'label': 'BMI30 - obesity', 'value': '30'},
@@ -311,23 +311,23 @@ dbc.Row([
     dbc.Accordion([
             dbc.AccordionItem(
                 [ html.B("Reference:"),
-                 html.P("The reference population for s-BMI is the WHO population, as such s-BMI shares SD0, SD1, SD2, SD3 with the WHO reference. However, to add SD levels above 3 SD the difference between 1st and 2nd SD was added."),
+                 html.P("The reference population for R-BMI is the WHO population, as such R-BMI shares SD0, SD1, SD2, SD3 with the WHO reference. However, to add SD levels above 3 SD the difference between 1st and 2nd SD was added."),
                  html.P(""),
                  html.B("Cut-offs"),
-                 html.P("Overweight: s-BMI >25 "),
-                 html.P("Obesity: s-BMI >30 "),
-                 html.P("Severe Obesity: s-BMI >35 "),
+                 html.P("Overweight: R-BMI >25 "),
+                 html.P("Obesity: R-BMI >30 "),
+                 html.P("Severe Obesity: R-BMI >35 "),
                  html.P(""),
                  html.B("Estimate child's BMI"),
                  html.P("""To estimate an individual child's BMI, age is first determined as months. For each child their BMI is converted to a standard deviation score (SD) using the LMS formula. 
                         If their SD score is equal or less than 3 compared to SD levels at the corresponding age, the LMS formula is solved for said SD score at 18 years of age.
-                        This gives the estimate of a s-BMI score at 18 years of age. If SD is above 3, linear interpolation is used to find the corresponding s-BMI. """),
+                        This gives the estimate of a R-BMI score at 18 years of age. If SD is above 3, linear interpolation is used to find the corresponding R-BMI. """),
                  html.P(""),
                  html.B("Links"),
                  html.P(""),
-                 html.A("Go to GitHub for processed table", href="https://raw.githubusercontent.com/molne1/Comparing-child-BMI/main/assets/2024-05-14_SBMI_SD1SD2.csv ", target="_blank"),
+                 html.A("Go to GitHub for processed table", href="https://raw.githubusercontent.com/molne1/Comparing-child-BMI/main/assets/2024-05-14_RBMI_SD1SD2.csv ", target="_blank"),
                 ],
-                title="Standardized BMI to the age of 18 years (s-BMI)",
+                title="Standardized BMI to the age of 18 years (R-BMI)",
             ),
             dbc.AccordionItem(
                 [html.B("Reference"),
@@ -427,7 +427,7 @@ dbc.Row(
 ])
 @app.callback(
     Output(component_id='graph-container', component_property='figure'),
-    Output(component_id='sbmi', component_property='children'),
+    Output(component_id='RBMI', component_property='children'),
 
     [Input(component_id = 'sex', component_property = 'value'),
      Input(component_id = 'layout', component_property = 'value'),
@@ -435,16 +435,16 @@ dbc.Row(
      Input(component_id = 'age_months', component_property = 'value'),
      Input(component_id = 'BMI', component_property = 'value'),
     
-     Input(component_id =  'checkbox-container_SBMI', component_property='value'), 
+     Input(component_id =  'checkbox-container_RBMI', component_property='value'), 
     Input(component_id = 'checkbox-container_WHO', component_property='value'), 
     Input(component_id = 'checkbox-container_IOTF', component_property = 'value'),
     Input(component_id = 'checkbox-container_CDC', component_property='value'), 
     Input(component_id = 'checkbox-container_CDC95P', component_property = 'value'),
     ]
 )
-def update_graph(sex, layout, age_years, age_months, bmi, SBMI, WHO, IOTF, CDC, CDC95P):
+def update_graph(sex, layout, age_years, age_months, bmi, RBMI, WHO, IOTF, CDC, CDC95P):
     if sex == []:
-        SBMI_axes = girls['SBMI']  
+        RBMI_axes = girls['RBMI']  
         WHO_axes = girls['WHO']
         IOTF_axes = girls['IOTF']
         CDC_axes = girls['CDC']
@@ -453,7 +453,7 @@ def update_graph(sex, layout, age_years, age_months, bmi, SBMI, WHO, IOTF, CDC, 
         sex_nr = 2
 
     if sex == [2]:
-        SBMI_axes = boys['SBMI']  
+        RBMI_axes = boys['RBMI']  
         WHO_axes = boys['WHO']
         IOTF_axes = boys['IOTF']
         CDC_axes = boys['CDC']
@@ -462,16 +462,16 @@ def update_graph(sex, layout, age_years, age_months, bmi, SBMI, WHO, IOTF, CDC, 
         sex_nr = 1
 
     fig = go.Figure()
-#SBMI
-    for level in reversed(SBMI):
-        fig.add_trace(go.Scatter(x=SBMI_axes['age_months'], y=SBMI_axes[level], mode='lines', name=level,
-                                 line=dict(color=SBMI_color), showlegend=False))
+#RBMI
+    for level in reversed(RBMI):
+        fig.add_trace(go.Scatter(x=RBMI_axes['age_months'], y=RBMI_axes[level], mode='lines', name=level,
+                                 line=dict(color=RBMI_color), showlegend=False))
         
-        label = f'SBMI-{level}'
+        label = f'RBMI-{level}'
         placement_y = 98
-        max_value_x = SBMI_axes[(SBMI_axes['age_months'] == placement_y)][level].iloc[0]
+        max_value_x = RBMI_axes[(RBMI_axes['age_months'] == placement_y)][level].iloc[0]
         fig.add_annotation(x=placement_y, y=max_value_x, text=label, showarrow=False, font=dict(size=8), bgcolor="white",
-                           bordercolor = SBMI_color, borderwidth=1)
+                           bordercolor = RBMI_color, borderwidth=1)
 #WHO
     for level in reversed(WHO):
         fig.add_trace(go.Scatter(x=WHO_axes['age_months'], y=WHO_axes[level], mode='lines', name=level,
@@ -564,14 +564,14 @@ def update_graph(sex, layout, age_years, age_months, bmi, SBMI, WHO, IOTF, CDC, 
       
 
 # plot child
-    no_sbmi = False   
+    no_RBMI = False   
     if age_years is None and age_months is None:
-        no_sbmi = True   
-        sbmi_result = "s-BMI will display here" 
+        no_RBMI = True   
+        RBMI_result = "R-BMI will display here" 
     if age_years ==0 and age_months == 0:
         age_total_months = 0
     if bmi is None:
-        sbmi_result = "s-BMI will display here" 
+        RBMI_result = "R-BMI will display here" 
     if age_years is None and age_months is not None:
         age_total_months = age_months
     if age_years is not None and age_months is None:
@@ -580,9 +580,9 @@ def update_graph(sex, layout, age_years, age_months, bmi, SBMI, WHO, IOTF, CDC, 
         age_total_months = age_years*12 + age_months
 
 
-    if no_sbmi == False and bmi is not None:
+    if no_RBMI == False and bmi is not None:
 
-        sbmi_number, sbmi_result = sbmi_zscore(age_total_months, sex_nr, bmi)    
+        RBMI_number, RBMI_result = RBMI_zscore(age_total_months, sex_nr, bmi)    
 
 
         fig.add_trace(go.Scatter(
@@ -593,7 +593,7 @@ def update_graph(sex, layout, age_years, age_months, bmi, SBMI, WHO, IOTF, CDC, 
                         ,showlegend=False,
                         name='Child'
                     ))
-    return fig, sbmi_result
+    return fig, RBMI_result
 
 
 if __name__ == '__main__':
