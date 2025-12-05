@@ -70,7 +70,7 @@ calculate_r_bmi <- function(df, sex_column, bmi_column, age_column, age_in_month
     if (isTRUE(age_in_months)) {
       age <- suppressWarnings(as.integer(age_in))
     } else {
-      age <- suppressWarnings(as.integer(round(get_numeric(age_in) / 12)))
+      age <- suppressWarnings(as.integer(round(get_numeric(age_in) * 12)))
     }
 
     if (is.na(age)) {
