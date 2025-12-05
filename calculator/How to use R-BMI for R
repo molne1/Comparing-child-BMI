@@ -1,4 +1,5 @@
-
+# copy this into your R scipt
+# ------------------
 #download the function 
 download.file(
   url = "https://raw.githubusercontent.com/molne1/Comparing-child-BMI/refs/heads/main/calculator/calculate_r_bmi.R",
@@ -8,6 +9,7 @@ download.file(
 
 #call this in your R-file
 source("calculate_r_bmi.R")
+# ------------------
 
 # now you can use it
 df_results <- calculate_r_bmi(df_test,
