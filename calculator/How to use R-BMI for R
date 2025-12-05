@@ -1,7 +1,7 @@
 
 #download the function 
 download.file(
-  url = "https://raw.githubusercontent.com/megamoln1/Comparing-child-BMI/calculator/R-BMI_for_R.R",
+  url = "https://raw.githubusercontent.com/megamoln1/Comparing-child-BMI/calculator/calculate_r_bmi.R",
   destfile = "calculate_r_bmi.R",
   mode = "wb"
 )
