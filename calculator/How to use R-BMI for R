@@ -1,4 +1,4 @@
-# copy this into your R scipt
+# copy this into your R scipt and run
 # ------------------
 #download the function 
 download.file(
