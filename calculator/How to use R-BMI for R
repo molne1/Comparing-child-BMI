@@ -11,7 +11,7 @@ source("calculate_r_bmi.R")
 
 # now you can use it
 df_results <- calculate_r_bmi(df_test,
-                          sex_column = "sex",    # fill in your sex column - as of yet it has to be coded as 1 (boy), 2 (girl)
+                          sex_column = "sex",    # fill in the name of the column categorizing sex within "" - as of yet it has to be coded as 1 (boy), 2 (girl)
                           bmi_column = "bmi",     # your column for bmi 
                           age_column = "age_months",    #your column for age either 
                           age_in_months = TRUE)   #if this is false then age should be in years 
